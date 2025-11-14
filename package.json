@@ -1,0 +1,14 @@
+{
+  "name": "user-info-form",
+  "version": "1.0.0",
+  "description": "A simple form to collect user information.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "nodemailer": "^7.0.10"
+  }
+}
