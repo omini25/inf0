@@ -29,11 +29,21 @@ app.post('/submit', async (req, res) => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
+        // Helpful timeouts and logging for diagnosing ETIMEDOUT
+        logger: true,
+        debug: true,
+        connectionTimeout: 10000,
+        greetingTimeout: 5000,
+        socketTimeout: 10000,
+        tls: {
+            // set to false only for testing if the server has a self-signed cert
+            rejectUnauthorized: false,
+        },
     });
 
     const mailOptions = {
         from: `"Form Submission" <${process.env.EMAIL_USER}>`,
-        to: 'recipient@example.com', // Change to your recipient email address
+        to: 'david.igiebor@gmail.com',
         subject: 'New Travel Information Form Submission',
         html: `
             <h1>New Form Submission</h1>
@@ -70,12 +80,21 @@ app.post('/submit', async (req, res) => {
     };
 
     try {
+        // Verify SMTP connection first — this will fail fast if the server is unreachable
+        await transporter.verify();
+    } catch (verifyErr) {
+        console.error('SMTP verify failed:', verifyErr);
+        return res.status(502).json({ message: 'SMTP connection failed', error: verifyErr && verifyErr.message ? verifyErr.message : String(verifyErr) });
+    }
+
+    try {
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully');
         res.status(200).json({ message: 'Data received and email sent successfully!' });
     } catch (error) {
         console.error('Error sending email:', error);
-        res.status(500).json({ message: 'Error sending email' });
+        const code = error && error.code ? error.code : undefined;
+        return res.status(500).json({ message: 'Error sending email', error: error && error.message ? error.message : String(error), code });
     }
 });
 

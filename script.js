@@ -1,6 +1,16 @@
 document.getElementById('user-form').addEventListener('submit', async function(event) {
     event.preventDefault();
 
+    // Disable submit and show loading state
+    const submitBtn = document.getElementById('submit-btn');
+    const spinner = document.getElementById('btn-spinner');
+    const btnText = document.getElementById('btn-text');
+    const formStatus = document.getElementById('form-status');
+    submitBtn.disabled = true;
+    spinner.style.display = 'inline-block';
+    btnText.textContent = 'Submitting...';
+    submitBtn.setAttribute('aria-busy', 'true');
+
     // 1. Get Form Data
     const formData = {
         firstName: document.getElementById('firstName').value,
@@ -51,11 +61,24 @@ document.getElementById('user-form').addEventListener('submit', async function(e
         if (response.ok) {
             document.getElementById('user-form').style.display = 'none';
             document.getElementById('success-message').style.display = 'block';
+            formStatus.textContent = '';
+            // keep button disabled after success
+            spinner.style.display = 'none';
+            btnText.textContent = 'Submitted';
+            submitBtn.setAttribute('aria-busy', 'false');
         } else {
-            alert('Form submission failed. Please try again.');
+            formStatus.textContent = 'Submission failed. Please try again.';
+            submitBtn.disabled = false;
+            spinner.style.display = 'none';
+            btnText.textContent = 'Submit';
+            submitBtn.setAttribute('aria-busy', 'false');
         }
     } catch (error) {
         console.error('Error submitting form:', error);
-        alert('Form submission failed. Please try again.');
+        formStatus.textContent = 'Submission failed. Please try again.';
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Submit';
+        submitBtn.setAttribute('aria-busy', 'false');
     }
 });
