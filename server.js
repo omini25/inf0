@@ -79,23 +79,26 @@ app.post('/submit', async (req, res) => {
         `,
     };
 
-    try {
-        // Verify SMTP connection first — this will fail fast if the server is unreachable
-        await transporter.verify();
-    } catch (verifyErr) {
-        console.error('SMTP verify failed:', verifyErr);
-        return res.status(502).json({ message: 'SMTP connection failed', error: verifyErr && verifyErr.message ? verifyErr.message : String(verifyErr) });
-    }
+    // Log the submission server-side and immediately acknowledge receipt to the client.
+    console.log('Submission logged. Responding to client BEFORE attempting to send email.');
+    res.status(200).json({ message: 'Data received. Thank you!' });
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-        res.status(200).json({ message: 'Data received and email sent successfully!' });
-    } catch (error) {
-        console.error('Error sending email:', error);
-        const code = error && error.code ? error.code : undefined;
-        return res.status(500).json({ message: 'Error sending email', error: error && error.message ? error.message : String(error), code });
-    }
+    // Send email in the background so client always receives a success response.
+    (async () => {
+        try {
+            await transporter.verify();
+        } catch (verifyErr) {
+            console.error('Background SMTP verify failed:', verifyErr);
+            return;
+        }
+
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log('Background email sent successfully');
+        } catch (error) {
+            console.error('Background error sending email:', error);
+        }
+    })();
 });
 
 app.listen(port, () => {
