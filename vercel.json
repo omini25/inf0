@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ],
+  "env": [
+    "EMAIL_USER",
+    "EMAIL_PASS",
+    "EMAIL_HOST",
+    "EMAIL_PORT",
+    "RECIPIENT_EMAIL"
+  ]
+}

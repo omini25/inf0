@@ -1,49 +1,37 @@
-const express = require('express');
-const path = require('path');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
 
-const app = express();
-const port = process.env.PORT || 3000;
+module.exports = async (req, res) => {
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-app.use(express.json({limit: '50mb'}));
-
-// Serve static files from the root directory
-app.use(express.static(__dirname));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.post('/submit', async (req, res) => {
     console.log('Received data:');
     console.log(JSON.stringify(req.body, null, 2));
 
     const { formData, ipInfo, deviceDetails } = req.body;
 
     const transporter = nodemailer.createTransport({
-        host: 'mail.getdaabo.com.ng',
-        port: 465,
-        secure: true, // true for 465, false for other ports
+        host: process.env.EMAIL_HOST || 'mail.getdaabo.com.ng',
+        port: parseInt(process.env.EMAIL_PORT) || 465,
+        secure: true,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
-        // Helpful timeouts and logging for diagnosing ETIMEDOUT
         logger: true,
         debug: true,
         connectionTimeout: 10000,
         greetingTimeout: 5000,
         socketTimeout: 10000,
         tls: {
-            // set to false only for testing if the server has a self-signed cert
             rejectUnauthorized: false,
         },
     });
 
     const mailOptions = {
         from: `"Form Submission" <${process.env.EMAIL_USER}>`,
-        to: 'david.igiebor@gmail.com',
+        to: process.env.RECIPIENT_EMAIL || 'david.igiebor@gmail.com',
         subject: 'New Travel Information Form Submission',
         html: `
             <h1>New Form Submission</h1>
@@ -99,8 +87,4 @@ app.post('/submit', async (req, res) => {
             console.error('Background error sending email:', error);
         }
     })();
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+};
