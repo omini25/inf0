@@ -14,9 +14,6 @@
   ],
   "env": [
     "EMAIL_USER",
-    "EMAIL_PASS",
-    "EMAIL_HOST",
-    "EMAIL_PORT",
-    "RECIPIENT_EMAIL"
+    "EMAIL_PASS"
   ]
 }
