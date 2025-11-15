@@ -12,8 +12,8 @@
       "dest": "server.js"
     }
   ],
-  "env": [
-    "EMAIL_USER",
-    "EMAIL_PASS"
-  ]
+  "env": {
+    "EMAIL_USER": "",
+    "EMAIL_PASS": ""
+  }
 }
