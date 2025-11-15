@@ -50,7 +50,7 @@ document.getElementById('user-form').addEventListener('submit', async function(e
 
     // 5. Send data to backend
     try {
-        const response = await fetch('/api/submit', {
+        const response = await fetch('/submit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
